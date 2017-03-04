@@ -288,7 +288,7 @@ $(document).ready(function() {
       $(".page").text("page: " +state.slideData[0].page);
       state.slideData[0].map(crashFeatures);
       console.log(state.slideData[0].map(crashFeatures));
-      removeLayer(state.slideData[0].map(crashFeatures));
+      state.slideData[0].map(crashFeatures).clearLayer();
 
       $("#back").prop("disabled",true);
       $("#back-to-initial").prop("disabled",true);
@@ -297,7 +297,7 @@ $(document).ready(function() {
 
       // Button Events
       $("#next").click(function(ev){
-        map.removeLayer(state.slideData[0]); // ??????????????????? don't know how to remove existing layers  ??????????????
+        // ??????????????????? don't know how to remove existing layers  ??????????????
         clickNextButton();
         state.slideData[state.slideNumber].map(crashFeatures);
         //console.log("both button are working!");
