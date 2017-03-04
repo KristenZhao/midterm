@@ -288,7 +288,7 @@ $(document).ready(function() {
       $(".page").text("page: " +state.slideData[0].page);
       state.slideData[0].map(crashFeatures);
       console.log(state.slideData[0].map(crashFeatures));
-      state.slideData[0].map(crashFeatures).clearLayer();
+      map.removeLayer(state.slideData[0].map(crashFeatures));
 
       $("#back").prop("disabled",true);
       $("#back-to-initial").prop("disabled",true);
