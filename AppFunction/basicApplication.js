@@ -79,32 +79,6 @@ var fallFilter = function(data){
   return condition;
 };
 
-// var overlay = function(data){
-//     var fill;
-//     var month = data.properties.CRASH_MONT;
-//     if(month === '9'||
-//         month === "10"||
-//         month === "11"){
-//       fill = "f43206";
-//     } else if (feature.properties.COLLDAY== 'TUE') {
-//       fill = 'yellow';
-//     } else if (feature.properties.COLLDAY== 'WED') {
-//       fill = 'blue';
-//     } else if (feature.properties.COLLDAY== 'THU') {
-//       fill = 'green';
-//     } else if (feature.properties.COLLDAY== 'FRI') {
-//       fill = 'pink';
-//     } else if (feature.properties.COLLDAY== 'SAT') {
-//       fill = 'purple';
-//     } else if (feature.properties.COLLDAY== 'SUN'){
-//       fill = 'orange';
-//     } else{
-//       fill = 'black';
-//     }
-//     console.log("COLLDAY",feature.properties.COLLDAY);
-//     return {fillColor: fill};
-//   };
-// }
 /* ===============================
 STEP 3 -  set crash point data styles
 ==============================*/
@@ -160,7 +134,7 @@ var geojsonMarkerOption_Fall = {
     fillOpacity: 0.8
 };
 
-// set overlay style
+// set overlay style, a function that color crashes based on their season
 var geojsonMarkerOption_overlay = function(data){
   var month = data.properties.CRASH_MONT;
   var render;
@@ -171,43 +145,43 @@ var geojsonMarkerOption_overlay = function(data){
                   weight: 1,
                   opacity: 1,
                   fillOpacity: 0.8};
-} else if (month === '3'||month === "4"||month === "5") {
-    render = {
-      radius: 3,
-      fillColor: "#4a8e15",
-      color: "#eeeeee",
-      weight: 1,
-      opacity: 1,
-      fillOpacity: 0.8
-    };
-} else if (month === '6'||month === "7"||month === "8") {
-    render = {
-      radius: 3,
-      fillColor: "#baa92a",
-      color: "#eeeeee",
-      weight: 1,
-      opacity: 1,
-      fillOpacity: 0.8
-    };
-} else if (month === '9'||month === "10"||month === "11") {
-    render = {
-      radius: 3,
-      fillColor: "#f43206",
-      color: "#eeeeee",
-      weight: 1,
-      opacity: 1,
-      fillOpacity: 0.8
+  } else if (month === '3'||month === "4"||month === "5") {
+      render = {
+        radius: 3,
+        fillColor: "#4a8e15",
+        color: "#eeeeee",
+        weight: 1,
+        opacity: 1,
+        fillOpacity: 0.8
+      };
+  } else if (month === '6'||month === "7"||month === "8") {
+      render = {
+        radius: 3,
+        fillColor: "#baa92a",
+        color: "#eeeeee",
+        weight: 1,
+        opacity: 1,
+        fillOpacity: 0.8
+      };
+  } else if (month === '9'||month === "10"||month === "11") {
+      render = {
+        radius: 3,
+        fillColor: "#f43206",
+        color: "#eeeeee",
+        weight: 1,
+        opacity: 1,
+        fillOpacity: 0.8
     };
   } else {
-    render = {
-      radius: 3,
-      fillColor: "#aaaaaa",
-      color: "#eeeeee",
-      weight: 1,
-      opacity: 1,
-      fillOpacity: 0.8
-    };
-  } return render;
+      render = {
+        radius: 3,
+        fillColor: "#aaaaaa",
+        color: "#eeeeee",
+        weight: 1,
+        opacity: 1,
+        fillOpacity: 0.8
+      };
+    } return render;
 };
 /* ===============================
 STEP 4 - state object: information on each slide
@@ -278,6 +252,8 @@ var state = {
 /* ===============================
 STEP 5 - button functions
 ==============================*/
+// 1. clickNextButton allows people to click to the next page, but when user gets to
+// the last page, it will disable the button.
 var clickNextButton = function() {
   state.slideNumber += 1;
   if (state.slideNumber < state.slideData.length-1){
@@ -300,6 +276,8 @@ var clickNextButton = function() {
   return (pageState);
 };
 
+// 2. clickPreviousButton allows people to click to the previous page, but when user gets to
+// the last page, it will disable the button.
 var clickPreviousButton = function() {
   state.slideNumber -=1;
   if (state.slideNumber > 0){
@@ -321,6 +299,7 @@ var clickPreviousButton = function() {
   return (pageState);
 };
 
+// 3. theEndButton allows people to click to the last page, and it will disable the button.
 var theEndButton = function(){
     state.slideNumber = state.slideData.length-1;
     console.log('state number:'+state.slideData[state.slideNumber].name);
@@ -336,6 +315,7 @@ var theEndButton = function(){
     return (pageState);
 };
 
+// 4. theFrontButton allows people to click to the first page, and it will disable the button.
 var theFrontButton = function(){
     state.slideNumber = 0;
     console.log('state number:'+state.slideData[state.slideNumber].name);
@@ -359,12 +339,16 @@ STEP 6 - Execution /////////////////
 $(document).ready(function() {
     $.ajax(bikeCrash).done(function(data){
       //console.log(data);
+      /* ===============================
+      Part 0 - Import geoJSON data and parse it
+      ==============================*/
       var parsedCrash = JSON.parse(data);
       var crashFeatures = parsedCrash.features;
       //console.log(crashFeatures[0].geometry.coordinates);
 
       /* ===============================
-      Part 1 - Filter points into all, and four seasons
+      Part 1 - add a Point property to the state object, which stores the points
+      need to be displayed
       ==============================*/
 
       state.slideData[0].Point = L.geoJson(crashFeatures, {
@@ -405,17 +389,13 @@ $(document).ready(function() {
 
       state.slideData[5].Point = L.geoJson(crashFeatures, {
       pointToLayer: function (point,style) {
-      //console.log("index", index);
-      // var overlay = [L.circleMarker([point.geometry.coordinates[1],point.geometry.coordinates[0]], geojsonMarkerOption_Spring),
-      //                 L.circleMarker([point.geometry.coordinates[1],point.geometry.coordinates[0]], geojsonMarkerOption_Summer),
-      //                 L.circleMarker([point.geometry.coordinates[1],point.geometry.coordinates[0]], geojsonMarkerOption_Fall),
-      //               L.circleMarker([point.geometry.coordinates[1],point.geometry.coordinates[0]], geojsonMarkerOption_Winter)];
-        //console.log(overlay);
-        //console.log(point);
         return L.circleMarker([point.geometry.coordinates[1],point.geometry.coordinates[0]], geojsonMarkerOption_overlay(point));
         }
       });
 
+      /* ===============================
+      Part 2 - set up initial page by providing contents and proper buttons
+      ==============================*/
       $(".subtitle").text(state.slideData[0].name);
       $(".description").text(state.slideData[0].content);
       $(".page").text("page: " +state.slideData[0].page);
@@ -427,9 +407,11 @@ $(document).ready(function() {
       console.log(state.slideNumber);
       //$(".description").text("page number: "+state.slideNumber); //?? why cannot print slideNumber?? need to use + not ,!!
 
-      // Button Events
+      /* ===============================
+      Part 3 - set up button events to allow user interaction
+      once a button is clicked, it will remove previous map and load the new one
+      ==============================*/
       $("#next").click(function(ev){
-        // ??????????????????? don't know how to remove existing layers  ??????????????
         map.removeLayer(state.slideData[state.slideNumber].Point);
         clickNextButton();
         state.slideData[state.slideNumber].Point.addTo(map);
