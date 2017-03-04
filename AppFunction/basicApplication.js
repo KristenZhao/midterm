@@ -79,6 +79,32 @@ var fallFilter = function(data){
   return condition;
 };
 
+// var overlay = function(data){
+//     var fill;
+//     var month = data.properties.CRASH_MONT;
+//     if(month === '9'||
+//         month === "10"||
+//         month === "11"){
+//       fill = "f43206";
+//     } else if (feature.properties.COLLDAY== 'TUE') {
+//       fill = 'yellow';
+//     } else if (feature.properties.COLLDAY== 'WED') {
+//       fill = 'blue';
+//     } else if (feature.properties.COLLDAY== 'THU') {
+//       fill = 'green';
+//     } else if (feature.properties.COLLDAY== 'FRI') {
+//       fill = 'pink';
+//     } else if (feature.properties.COLLDAY== 'SAT') {
+//       fill = 'purple';
+//     } else if (feature.properties.COLLDAY== 'SUN'){
+//       fill = 'orange';
+//     } else{
+//       fill = 'black';
+//     }
+//     console.log("COLLDAY",feature.properties.COLLDAY);
+//     return {fillColor: fill};
+//   };
+// }
 /* ===============================
 STEP 3 -  set crash point data styles
 ==============================*/
@@ -107,7 +133,7 @@ var geojsonMarkerOption_Winter = {
 // set "spring" style
 var geojsonMarkerOption_Spring = {
     radius: 3,
-    fillColor: "#69db6e",
+    fillColor: "#4a8e15",
     color: "#eeeeee",
     weight: 1,
     opacity: 1,
@@ -117,7 +143,7 @@ var geojsonMarkerOption_Spring = {
 // set "summer" style
 var geojsonMarkerOption_Summer = {
     radius: 3,
-    fillColor: "#f0f407",
+    fillColor: "#baa92a",
     color: "#eeeeee",
     weight: 1,
     opacity: 1,
@@ -133,6 +159,56 @@ var geojsonMarkerOption_Fall = {
     opacity: 1,
     fillOpacity: 0.8
 };
+
+// set overlay style
+var geojsonMarkerOption_overlay = function(data){
+  var month = data.properties.CRASH_MONT;
+  var render;
+  if (month === '12'||month === "1"||month === "2"){
+    render = {radius: 3,
+                  fillColor: "#2155a8",
+                  color: "#eeeeee",
+                  weight: 1,
+                  opacity: 1,
+                  fillOpacity: 0.8};
+} else if (month === '3'||month === "4"||month === "5") {
+    render = {
+      radius: 3,
+      fillColor: "#4a8e15",
+      color: "#eeeeee",
+      weight: 1,
+      opacity: 1,
+      fillOpacity: 0.8
+    };
+} else if (month === '6'||month === "7"||month === "8") {
+    render = {
+      radius: 3,
+      fillColor: "#baa92a",
+      color: "#eeeeee",
+      weight: 1,
+      opacity: 1,
+      fillOpacity: 0.8
+    };
+} else if (month === '9'||month === "10"||month === "11") {
+    render = {
+      radius: 3,
+      fillColor: "#f43206",
+      color: "#eeeeee",
+      weight: 1,
+      opacity: 1,
+      fillOpacity: 0.8
+    };
+  } else {
+    render = {
+      radius: 3,
+      fillColor: "#aaaaaa",
+      color: "#eeeeee",
+      weight: 1,
+      opacity: 1,
+      fillOpacity: 0.8
+    };
+  } return render;
+};
 /* ===============================
 STEP 4 - state object: information on each slide
 ==============================*/
@@ -144,51 +220,56 @@ var state = {
   "slideData": [
     {
       "name": "All crashes that involved with bike and cars", //<h2>
-      "content": "There are 551 crashes in 2014. The majority of accidents happened" +
+      "content": "There are 551 crashes in 2014. The majority of accidents happened " +
       "in the Center City and the University City area.", //<p>
-      "page": "1 of 6",
-      "map" : function (data){
-                var allPoint = L.geoJson(data, {
-                pointToLayer: function (point,style) {
-                //console.log("index", index);
-                  return L.circleMarker([point.geometry.coordinates[1],point.geometry.coordinates[0]], geojsonMarkerOptions);
-                }
-              }).addTo(map);
-              return allPoint;
-            }
+      "page": "1 of 6"
+      // "mapPoint" : function (data){
+      //           data.addTo(map);
+      //         //map.removeLayer(allPoint);
+      //         //return allPoint;
+      //         console.log("map data function ran");
+      //       },
+      // "removePoint" : function(data){
+      //             map.removeLayer(data);
+      //             console.log("removePoint ran");
     },
     {
       "name": "Winter months (Dec,Jan,Feb)",
-      "content": "In winter, bike crashes are concentrated in the center city area",
+      "content": "In winter, bike crashes are a little concentrated in the Univer" +
+      "sity city area, but there there are not many accidents in general.",
       "page": "2 of 6",
-      "map" : function (data){
-                L.geoJson(data, {
-                  filter: winterFilter,
-                  pointToLayer: function (point,style) {
-                  //console.log("index", index);
-                    return L.circleMarker([point.geometry.coordinates[1],point.geometry.coordinates[0]], geojsonMarkerOption_Winter);
-                  }
-                }).addTo(map);
-              }
+      // "mapPoint" : function (data){
+      //           data.addTo(map);
+      //         },
+      // "removePoint" : function(data){
+      //           map.removeLayer(data);
+      //           console.log("removePoint winter ran");
+
     },
     {
       "name": "Spring months (Mar,Apr,May)",
-      "content": "spring crash",
+      "content": "In spring, crash number start to increase. Many happened again in "+
+      "University City, center city and south philly area.",
       "page": "3 of 6"
     },
     {
       "name": "Summer months (Jun,Jul,Aug)",
-      "content": "summer crash",
+      "content": "In summer, crash counts really boomed. Accidents are everywhere. A lot "+
+      "of increase in Northern Liberty area.",
       "page": "4 of 6"
     },
     {
       "name": "Fall months(Sep,Oct,Nov)",
-      "content": "fall crash",
+      "content": "In fall, accidents remain high, but got more concentrated in center city "+
+      "area again, retrieved from nearby neighborhoods.",
       "page": "5 of 6"
     },
     {
       "name": "Bike Crash Conclusion",
-      "content": "conclusion",
+      "content": "In colder weathers, there are much less accidents. I wonder if it relates to "+
+      "people's biking habbit: less people bike in cooler temperature, therefore less accidents. "+
+      "But it is also worth noticing that crashes happen is same regions. Bike infrastructure "+
+      "improvement can be considered.",
       "page": "6 of 6"
     }
   ]
@@ -271,7 +352,10 @@ var theFrontButton = function(){
     //return ($(".description").text("page number: "+state.slideNumber));
 };
 
-//////////////// Execution /////////////////
+/* ===============================
+STEP 6 - Execution /////////////////
+==============================*/
+
 $(document).ready(function() {
     $.ajax(bikeCrash).done(function(data){
       //console.log(data);
@@ -280,15 +364,63 @@ $(document).ready(function() {
       //console.log(crashFeatures[0].geometry.coordinates);
 
       /* ===============================
-      Page 1: add Bike Crash Map, disable buttons
+      Part 1 - Filter points into all, and four seasons
       ==============================*/
-      //plot all crash onto initial page
+
+      state.slideData[0].Point = L.geoJson(crashFeatures, {
+      pointToLayer: function (point,style) {
+      //console.log("index", index);
+        return L.circleMarker([point.geometry.coordinates[1],point.geometry.coordinates[0]], geojsonMarkerOptions);
+        }
+      });
+
+      state.slideData[1].Point = L.geoJson(crashFeatures, {
+        filter: winterFilter,
+        pointToLayer: function (point,style) {
+        //console.log("index", index);
+          return L.circleMarker([point.geometry.coordinates[1],point.geometry.coordinates[0]], geojsonMarkerOption_Winter);
+        }
+      });
+
+      state.slideData[2].Point = L.geoJson(crashFeatures, {
+        filter: springFilter,
+        pointToLayer: function(point,style){
+          return L.circleMarker([point.geometry.coordinates[1],point.geometry.coordinates[0]], geojsonMarkerOption_Spring);
+        }
+      });
+
+      state.slideData[3].Point = L.geoJson(crashFeatures, {
+        filter: summerFilter,
+        pointToLayer: function(point,style){
+          return L.circleMarker([point.geometry.coordinates[1],point.geometry.coordinates[0]], geojsonMarkerOption_Summer);
+        }
+      });
+
+      state.slideData[4].Point = L.geoJson(crashFeatures, {
+        filter: fallFilter,
+        pointToLayer: function(point,style){
+          return L.circleMarker([point.geometry.coordinates[1],point.geometry.coordinates[0]], geojsonMarkerOption_Fall);
+        }
+      });
+
+      state.slideData[5].Point = L.geoJson(crashFeatures, {
+      pointToLayer: function (point,style) {
+      //console.log("index", index);
+      // var overlay = [L.circleMarker([point.geometry.coordinates[1],point.geometry.coordinates[0]], geojsonMarkerOption_Spring),
+      //                 L.circleMarker([point.geometry.coordinates[1],point.geometry.coordinates[0]], geojsonMarkerOption_Summer),
+      //                 L.circleMarker([point.geometry.coordinates[1],point.geometry.coordinates[0]], geojsonMarkerOption_Fall),
+      //               L.circleMarker([point.geometry.coordinates[1],point.geometry.coordinates[0]], geojsonMarkerOption_Winter)];
+        //console.log(overlay);
+        //console.log(point);
+        return L.circleMarker([point.geometry.coordinates[1],point.geometry.coordinates[0]], geojsonMarkerOption_overlay(point));
+        }
+      });
+
       $(".subtitle").text(state.slideData[0].name);
       $(".description").text(state.slideData[0].content);
       $(".page").text("page: " +state.slideData[0].page);
-      state.slideData[0].map(crashFeatures);
-      console.log(state.slideData[0].map(crashFeatures));
-      map.removeLayer(state.slideData[0].map(crashFeatures));
+      state.slideData[0].Point.addTo(map);
+      //map.removeLayer(state.slideData[0].Point);
 
       $("#back").prop("disabled",true);
       $("#back-to-initial").prop("disabled",true);
@@ -298,18 +430,25 @@ $(document).ready(function() {
       // Button Events
       $("#next").click(function(ev){
         // ??????????????????? don't know how to remove existing layers  ??????????????
+        map.removeLayer(state.slideData[state.slideNumber].Point);
         clickNextButton();
-        state.slideData[state.slideNumber].map(crashFeatures);
+        state.slideData[state.slideNumber].Point.addTo(map);
         //console.log("both button are working!");
       });
       $("#back").click(function(event){
+        map.removeLayer(state.slideData[state.slideNumber].Point);
         clickPreviousButton();
+        state.slideData[state.slideNumber].Point.addTo(map);
       });
       $("#to-the-end").click(function(event){
+        map.removeLayer(state.slideData[state.slideNumber].Point);
         theEndButton();
+        state.slideData[state.slideNumber].Point.addTo(map);
       });
       $("#back-to-initial").click(function(event){
+        map.removeLayer(state.slideData[state.slideNumber].Point);
         theFrontButton();
+        state.slideData[state.slideNumber].Point.addTo(map);
       });
   });
 });
